@@ -21,12 +21,21 @@ import quandl as ql
 ql.ApiConfig.api_key = "kzRLWtzrpzxLvSt-Hzo4"
 from fredapi import Fred
 
+# local functions
+import FRB_H8
+
+
+
 class vendor:
 
     def __init__(self):
 
         self.fred_api = Fred(api_key='4784f4ab3b06abdc6c8cbdfa4c7825db')
         return None
+
+    def H8(self):
+        h8 = FRB_H8.H8()
+        return h8.book
 
     def FRED_H4_asofwed(self):
 

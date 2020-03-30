@@ -163,6 +163,11 @@ class H8:
             pg = page(category=category, sa=sa, value=ts_list)
             self.pages.append(pg)
 
+        # Combine different pages into a single dataframe using the "combine" method (defined below).
+
+        variables = [ts.name for ts in self.pages[1].value]
+        self.book = self.combine(self.pages[1:],variables).swaplevel(axis=1).stack()
+
     def info(self):
         for page in self.pages:
             page_header = page.category + ', ' + page.sa
@@ -181,33 +186,26 @@ class H8:
                 i_ts = i
         return i_ts
 
-    def merge(self, tsname: str, multi_index=False):
-        df_list = []
-        for page in self.pages:
-            ts = page.value[self.search(page, tsname)].value
-            firstletter = ''.join([word[0].upper()
-                                   for word in tsname.split(' ')])
-            ts.columns = [firstletter + '_' + page.category[:3]]
-            df_list.append(ts)
-        df = pd.concat(df_list, axis=1)
-        return df
-
     def combine(self, pages, terms):
+        '''
+        Combine given pages and variables into a single dataframe with MultiIndex.
+        '''
+
         n = 0
         levels = [(a.category.split(' ')[0], b) for a in pages for b in terms]
-        columns = pd.MultiIndex.from_tuples(levels, names=['group', 'series'])
+        columns = pd.MultiIndex.from_tuples(levels, names=['page', 'ts'])
 
-        for page in pages:
-            tslist = [page.value[self.search(
-                page, name)].value for name in terms]
-            tempdf = functools.reduce(
-                (lambda x, y: pd.merge(x, y, left_index=True, right_index=True,
-                                       how='inner')), tslist)
+        for p in pages:
+            tslist = [ p.value[self.search(p,name)].value for name in terms]
+            _f = lambda x, y: pd.merge(x, y, left_index=True, right_index=True, how='outer')
+            tempdf = functools.reduce(_f,tslist)
+
             if n == 1:
-                df = df.merge(tempdf, left_index=True,
-                              right_index=True, how='inner')
+                df = df.merge(tempdf, left_index=True,right_index=True, how='outer')
             else:
                 df = tempdf
             n = 1
+
         df.columns = columns
+
         return df

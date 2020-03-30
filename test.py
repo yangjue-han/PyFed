@@ -2,35 +2,29 @@
 import os
 os.chdir('/Users/yangjuehan/Documents/GitHub/fed_api')
 import money_stock as ms
-from FRB_H8 import *
+import FRB_H8
+import plotly.express as px
 
+# load the data vendor
 get_data = ms.vendor()
+
+# Load H6 table
 H6 = get_data.FRED_H6()
+
+fig = px.line(H6.reset_index(), x= 'index', y = ['mmf_retail','mmf_inst'])
+fig.show()
+
 H4_avg = get_data.FRED_H4_weeklyavg()
+H4_avg.plot(figsize=(15,10))
+
 H4_wed = get_data.FRED_H4_asofwed()
+H8 = get_data.H8()
 
-h8 = H8()
+h8_api = FRB_H8.H8()
+h8_api.info()
 
-list_of_columns = [] # a list of column names, one entry for each group
-list_of_dataframes = [] # a list of dataframes, one entry for each group
-
-for p in [1,2,3]:
-    cols = [] # column names
-    list_of_ts = [] # ts objects
-    group = h8.pages[p].category
-    page = h8.pages[p].value
-    print("{}) Page for {}.".format(p,group))
-    N_ts = len(page) # number of ts objects
-    print("The number of items in this page is {}.".format(N_ts))
-    print('\n')
-    for i in range(N_ts):
-        ts = page[i]
-        cols.append(ts.name)
-        list_of_ts.append(ts.value)
-
-    df = list_of_ts[0]
-    for ts in list_of_ts[1:]:
-        df = df.merge(ts,left_index=True,right_index=True,how='outer')
-
-    list_of_columns.append(cols)
-    list_of_dataframes.append(df)
+items = ['Cash assets',
+         'Treasuries',
+         'Total fed funds sold and reverse repo',
+         'Loans to nondepository financial institutions']
+H8[items].unstack()['2009':].plot(figsize=(20,6))
