@@ -32,7 +32,7 @@ class vendor:
         # current dataset, the data contains daily time series of the past year
         gcf_current_url = 'https://www.dtcc.com/data/gcfindex.csv'
         gcf_current = pd.read_csv(gcf_current_url,skipfooter=2, engine='python')
-        gcf_current.to_csv(dirpath + 'Interest rates/gcf_current.csv')
+        #gcf_current.to_csv(os.getcwd() + '/data/interest rates/gcf_current.csv')
 
         gcf_current = gcf_current.rename(
                 columns = {
@@ -49,7 +49,7 @@ class vendor:
         # historical dataset
         gcf_hist_url = 'http://dtcc.com/data/GCF_Index_Graph.xlsx'
         gcf_hist = pd.read_excel(gcf_hist_url, skiprows=6)
-        gcf_hist.to_csv(dirpath + 'Interest rates/gcf_hist.csv')
+        #gcf_hist.to_csv(os.getcwd() + '/data/interest rates/gcf_hist.csv')
 
         gcf_hist = gcf_hist[['Date', 'MBS GCF Repo® \nWeighted Average Rate',
                'Treasury GCF Repo® \nWeighted \nAverage Rate',
@@ -73,6 +73,8 @@ class vendor:
         gcf.loc['2020-01-01':,'gcf_tsy'] = gcf_current['gcf_rate_tsy']['2020-01-01':]
         gcf.loc['2020-01-01':,'gcf_mbs'] = gcf_current['gcf_rate_mbs']['2020-01-01':]
         gcf=gcf[gcf.index.dayofweek<5] # keep only business days
+
+        gcf.to_csv(os.getcwd() + '/data/interest rates/gcf.csv')
 
         return gcf
 
@@ -132,6 +134,9 @@ class vendor:
             ['Deal Date','collateral','Op Type']
         ).mean()[['Effective Rate']].unstack().unstack()['Effective Rate']
         fed_op_rate = fed_op_rate[['RP','RRP']]
+
+        fed_op_rate.to_csv(os.getcwd() + '/data/interest rates/fed_op_rate.csv')
+        fed_op_vol.to_csv(os.getcwd() + '/data/interest rates/fed_op_vol.csv')
 
         if output == 'both':
             return fed_op_rate, fed_op_vol
