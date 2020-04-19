@@ -94,8 +94,11 @@ class vendor:
                 if we are interested in the weighted average, or 'Stop-Out' if we are interested
                 in the highest bid (the stop out rate is the highest rate accepted in a reverse repo).
         '''
-
-        fedrrp_url='https://websvcgatewayx2.frbny.org/autorates_tomo_external/services/v1_0/tomo/retrieveHistoricalExcel?f=07072000&t=04082020&ctt=true&&cta=true&ctm=true'
+        
+        
+        today = datetime.date.today() # pin down the date for today
+        
+        fedrrp_url='https://websvcgatewayx2.frbny.org/autorates_tomo_external/services/v1_0/tomo/retrieveHistoricalExcel?f=07072000&t={}&ctt=true&&cta=true&ctm=true'.format(today.strftime("%m%d%Y"))
         fed_op = pd.read_excel(fedrrp_url)
         fed_op['Deal Date']=pd.to_datetime(fed_op['Deal Date'], format = '%m/%d/%Y')
         fed_op.columns
