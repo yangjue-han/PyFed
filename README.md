@@ -1,6 +1,6 @@
 # Fed API
 
-This Python packages researchers to get easy access to many important public datasets on interest rates and money market dynamics. Datasets supported by this packages:
+This package allows researchers to get easy access to many important public datasets on interest rates and money market dynamics. Datasets supported by this packages:
 
 ## Federal Reserve Board tables: 
 
