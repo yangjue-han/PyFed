@@ -26,6 +26,7 @@ class vendor:
     def __init__(self):
 
         self.fred_api = Fred(api_key='4784f4ab3b06abdc6c8cbdfa4c7825db')
+        self.rootdir = os.getcwd()
 
     def dtcc_gcf(self):
 
@@ -94,10 +95,10 @@ class vendor:
                 if we are interested in the weighted average, or 'Stop-Out' if we are interested
                 in the highest bid (the stop out rate is the highest rate accepted in a reverse repo).
         '''
-        
-        
+
+
         today = datetime.date.today() # pin down the date for today
-        
+
         fedrrp_url='https://websvcgatewayx2.frbny.org/autorates_tomo_external/services/v1_0/tomo/retrieveHistoricalExcel?f=07072000&t={}&ctt=true&&cta=true&ctm=true'.format(today.strftime("%m%d%Y"))
         fed_op = pd.read_excel(fedrrp_url)
         fed_op['Deal Date']=pd.to_datetime(fed_op['Deal Date'], format = '%m/%d/%Y')
@@ -147,3 +148,73 @@ class vendor:
             return fed_op_rate
         elif output == 'vol':
             return fed_op_vol
+
+    def remove_prime(self,x):
+        if len(x)>3:
+            x = x[:-4]+x[-3:]
+        return float(x)
+
+    def nyfed_repo_indices(self):
+        #################################################################
+        # Tri-party, GCF, and Bilateral repo markets, NY Fed
+        #################################################################
+        today = datetime.date.today() # pin down the date for today
+        date_index = pd.date_range(start="1950-01-01", end=today.strftime("%Y-%m-%d"))
+        url = "https://websvcgatewayx2.frbny.org/mktrates_external_httponly/services/v1_0/mktRates/excel/retrieve?multipleRateTypes=true&startdate=04022018&enddate={}&rateType=R1%2cR2%2cR3".format(today.strftime("%m%d%Y"))
+        repo = pd.read_excel(url, skiprows = 3, skipfooter = 7)
+        colnames = ['Date', 'Index', 'Repo Rate', 'RP: 1st', 'RP: 25th', 'RP: 75th', 'RP: 99th', 'RP: Vol']
+        repo = repo.rename(columns = dict(zip(repo.columns,colnames)))
+        repo.head()
+        ######################
+        # repo rates, current
+        ######################
+        reporates = repo.groupby(['Date', 'Index']).mean().unstack('Index')['Repo Rate']
+        reporates.index = pd.to_datetime(list(map(lambda x: x.strip()[:10] , reporates.index.values)))
+        reporates.index.name=None
+        ############################################
+        # repo rates, historical 2014-2018.4.2
+        ###########################################
+        reporates_hist = pd.read_excel(os.path.join(self.rootdir,'data/interest rates/NYFed_repo_hist.xlsx'),
+                                       sheet_name = 'VWM Rates', header = 1, usecols = [0,1,2,3])
+        colnames = ['Date', 'TGCR', 'BGCR', 'SOFR']
+        reporates_hist = reporates_hist.rename(columns = dict(zip(reporates_hist.columns,colnames)))
+        reporates_hist.set_index('Date', inplace = True)
+        reporates_hist = reporates_hist.divide(100)
+        ############################################
+        # combine two repo rates
+        ############################################
+        rp = pd.DataFrame()
+        for x in reporates.columns:
+            rp[x] = pd.concat([reporates[x],reporates_hist[x]])
+        rp.sort_index(inplace = True)
+        sum(rp.index.duplicated())>0 #check whether there is duplicated values in the index
+        rp=rp.reindex(index=date_index)
+        rp=rp.astype(float).interpolate(method = 'linear',limit_area='inside')
+        ########################################
+        # Repo volume, current
+        ########################################
+        repo['RP: Vol'] = repo['RP: Vol'].apply(self.remove_prime)
+        repovol = repo.groupby(['Date', 'Index']).mean().unstack('Index')['RP: Vol']
+        repovol.index = list(map(lambda x: x.strip()[:10] , repovol.index.values))
+        repovol.index = pd.to_datetime(repovol.index)
+        #############################################################
+        # Repo volume historical 2014-2018.4.2
+        ###########################################
+        repovol_hist = pd.read_excel(os.path.join(self.rootdir,'data/interest rates/NYFed_repo_hist.xlsx'),
+                                    sheet_name = 'Volumes', header = 1, usecols = [0,1,2,3])
+        colnames = ['Date', 'TGCR', 'BGCR', 'SOFR']
+        repovol_hist = repovol_hist.rename(columns = dict(zip(repovol_hist.columns,colnames)))
+        repovol_hist.set_index('Date', inplace = True)
+        ########################################
+        # combine two repo volumes
+        ########################################
+        rpvol = pd.DataFrame()
+        for x in repovol.columns:
+            rpvol[x] = pd.concat([repovol[x],repovol_hist[x]])
+        rpvol.sort_index(inplace = True)
+        rpvol.rename(columns = dict(zip(rpvol.columns, [x + '_vol' for x in rpvol.columns])), inplace = True)
+        sum(rpvol.index.duplicated())>0 #check whether there is duplicated values in the index
+        rpvol=rpvol.reindex(index=date_index)
+        rpvol=rpvol.astype(float).interpolate(method = 'linear',limit_area='inside')
+
+        return rp, rpvol
