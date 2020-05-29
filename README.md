@@ -4,13 +4,13 @@ This package allows researchers to get easy access to many important public data
 
 1. Federal Reserve Board tables: 
 
-  - H4: factors supplying and absorbing central bank reserves 
+    - H4: factors supplying and absorbing central bank reserves 
 
-  - H6: money stocks 
+    - H6: money stocks 
 
-  - H8: weekly commercial banks balance sheet data
+    - H8: weekly commercial banks balance sheet data
 
-  - H15: interest rates 
+    - H15: interest rates 
 
 2. New York Fed open market operations
 
