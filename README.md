@@ -2,28 +2,31 @@
 
 This package allows researchers to get easy access to many important public datasets on interest rates and money market dynamics. Datasets supported by this packages:
 
-#### Federal Reserve Board tables: 
+1. Federal Reserve Board tables: 
 
-- H4: factors supplying and absorbing central bank reserves 
+  - H4: factors supplying and absorbing central bank reserves 
 
-- H6: money stocks 
+  - H6: money stocks 
 
-- H8: weekly commercial banks balance sheet data
+  - H8: weekly commercial banks balance sheet data
 
-- H15: interest rates 
+  - H15: interest rates 
 
-#### New York Fed open market operations
+2. New York Fed open market operations
 
-- repo and reverse repo operations
+  - repo and reverse repo operations
 
-- primary dealer activities (in progress)
+  - primary dealer activities (in progress)
 
-#### Repo rates
+3. Repo rates
 
-- DTCC GCF Repo Index
+  - DTCC GCF Repo Index
 
-- BNYM tri-party repo rate indices (updated monthly)
+  - BNYM tri-party repo rate indices (updated monthly)
 
-- NY Fed repo rate indices
+  - NY Fed repo rate indices
 
 All data are updated upon access unless otherwise noted.
+
+See the following demo in Colab [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yj1990/fed_api/blob/master/demo.ipynb)
+
