@@ -14,17 +14,17 @@ This package allows researchers to get easy access to many important public data
 
 2. New York Fed open market operations
 
-  - repo and reverse repo operations
+    - repo and reverse repo operations
 
-  - primary dealer activities (in progress)
+    - primary dealer activities (in progress)
 
 3. Repo rates
 
-  - DTCC GCF Repo Index
+    - DTCC GCF Repo Index
 
-  - BNYM tri-party repo rate indices (updated monthly)
+    - BNYM tri-party repo rate indices (updated monthly)
 
-  - NY Fed repo rate indices
+    - NY Fed repo rate indices
 
 All data are updated upon access unless otherwise noted.
 
