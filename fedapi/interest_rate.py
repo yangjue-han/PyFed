@@ -139,8 +139,8 @@ class vendor:
         ).mean()[['Effective Rate']].unstack().unstack()['Effective Rate']
         fed_op_rate = fed_op_rate[['RP','RRP']]
 
-        fed_op_rate.to_csv(os.getcwd() + '/data/interest rates/fed_op_rate.csv')
-        fed_op_vol.to_csv(os.getcwd() + '/data/interest rates/fed_op_vol.csv')
+        fed_op_rate.to_csv(os.path.join(os.getcwd(),'data/interest rates/fed_op_rate.csv'))
+        fed_op_vol.to_csv(os.path.join(os.getcwd(),'data/interest rates/fed_op_vol.csv'))
 
         if output == 'both':
             return fed_op_rate, fed_op_vol
