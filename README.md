@@ -1,4 +1,4 @@
-# Fed API
+# PyFed - Easy Access to the Fed's Data
 
 This package allows researchers to get easy access to many important public datasets on interest rates and money market dynamics. Datasets supported by this packages:
 
