@@ -28,5 +28,5 @@ This package allows researchers to get easy access to many important public data
 
 All data are updated upon access unless otherwise noted.
 
-See the following demo in Colab [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yj1990/fed_api/blob/master/demo.ipynb)
+See the following demo in Colab [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yj1990/PyFed/blob/master/demo.ipynb)
 
