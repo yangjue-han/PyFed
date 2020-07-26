@@ -22,7 +22,7 @@ ql.ApiConfig.api_key = "kzRLWtzrpzxLvSt-Hzo4"
 from fredapi import Fred
 
 # local functions
-import fedapi.FRB_H8 as FRB_H8
+import PyFed.FRB_H8 as FRB_H8
 
 class vendor:
 
