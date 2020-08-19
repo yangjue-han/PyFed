@@ -2,7 +2,7 @@
 
 This package enables easy access to many important public datasets provided by the Federal Reserve. 
 
-## Federal Reserve Board tables: 
+## Federal Reserve Board tables
 
 - H4: factors supplying and absorbing central bank reserves 
 - H6: money stocks 
