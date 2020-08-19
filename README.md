@@ -19,9 +19,3 @@ This package allows researchers to get easy access to many important public data
 - DTCC GCF Repo Index
 - BNYM tri-party repo rate indices (updated monthly)
 - NY Fed repo rate indices
-
-
-Note: All data are updated upon access unless otherwise noted.
-
-See the following demo in Colab [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yj1990/PyFed/blob/master/demo.ipynb)
-
