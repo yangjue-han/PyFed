@@ -119,6 +119,35 @@ class vendor:
 
         return df
 
+    def FRED_CP(self):
+
+        """
+        Federal Reserve Board Commercial Paper Outstanding Levels Table
+        ----------------------------------
+        Units: Billion USD, Not Seasonally Adjusted
+        Frequency: weekly, as of Wednesday
+        ----------------------------------
+        """
+
+        data_description = {
+        'COMPUTN': 'commercial paper outstanding all',
+        'COMPAPER': 'commercial paper of non-financial firms',
+        'DNFINCPN': 'commercial paper of non-financial firms - domestic',
+        'FNFINCPN': 'commercial paper of non-financial firms - foreign',
+        'FINCPN': 'financial commercial ppaer',
+        'DFINCPN': 'financial commercial paper - domestic',
+        'FFINCPN': 'financial commercial paper - foreign',
+        'ABCOMPN': 'asset-backed commercial paper',
+        'OTHCOMPN': 'other commercial paper'
+        }
+        data_list = dict()
+        for key,name in data_description.items():
+            data_list[name] = self.fred_api.get_series(key)
+        df = pd.DataFrame(data_list)
+        df.dropna(how='all',inplace=True)
+
+        return df
+
     def FoF(self):
 
         FoF_house_ID, FoF_house_Name = read_ID('FoF_Households_README.txt')

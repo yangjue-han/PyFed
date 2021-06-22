@@ -65,15 +65,16 @@ class vendor:
         gcf_hist.index = pd.to_datetime(gcf_hist.index,format = '%Y-%m-%d')
 
         # so far the historical dataset extends to 2019-12-31, needs to be updated next year
+        current_start_date = '{}-01-01'.format(date.today().year)
         gcf = pd.DataFrame(
             columns=['gcf_tsy','gcf_mbs'],
             index= pd.date_range(start="2005-01-01", end=gcf_current.index[-1])
         )
         gcf.loc[gcf_hist.index,'gcf_tsy'] = gcf_hist['gcf_rate_tsy'].copy()
         gcf.loc[gcf_hist.index,'gcf_mbs'] = gcf_hist['gcf_rate_mbs'].copy()
-        gcf.loc['2020-01-01':,'gcf_tsy'] = gcf_current['gcf_rate_tsy']['2020-01-01':]
-        gcf.loc['2020-01-01':,'gcf_mbs'] = gcf_current['gcf_rate_mbs']['2020-01-01':]
-        gcf=gcf[gcf.index.dayofweek<5] # keep only business days
+        gcf.loc[current_start_date:,'gcf_tsy'] = gcf_current['gcf_rate_tsy'][current_start_date:]
+        gcf.loc[current_start_date:,'gcf_mbs'] = gcf_current['gcf_rate_mbs'][current_start_date:]
+        gcf=gcf.resample('b').last().ffill() # keep only business days
 
         gcf.to_csv(os.getcwd() + '/data/interest rates/gcf.csv')
 
@@ -159,7 +160,7 @@ class vendor:
         # Tri-party, GCF, and Bilateral repo markets, NY Fed
         #################################################################
         today = datetime.date.today() # pin down the date for today
-        date_index = pd.date_range(start="1950-01-01", end=today.strftime("%Y-%m-%d"))
+        date_index = pd.bdate_range(start="1950-01-01", end=today.strftime("%Y-%m-%d"))
         url = "https://websvcgatewayx2.frbny.org/mktrates_external_httponly/services/v1_0/mktRates/excel/retrieve?multipleRateTypes=true&startdate=04022018&enddate={}&rateType=R1%2cR2%2cR3".format(today.strftime("%m%d%Y"))
         repo = pd.read_excel(url, skiprows = 3, skipfooter = 7)
         colnames = ['Date', 'Index', 'Repo Rate', 'RP: 1st', 'RP: 25th', 'RP: 75th', 'RP: 99th', 'RP: Vol']
@@ -187,9 +188,9 @@ class vendor:
         for x in reporates.columns:
             rp[x] = pd.concat([reporates[x],reporates_hist[x]])
         rp.sort_index(inplace = True)
-        sum(rp.index.duplicated())>0 #check whether there is duplicated values in the index
-        rp=rp.reindex(index=date_index)
-        rp=rp.astype(float).interpolate(method = 'linear',limit_area='inside')
+        #sum(rp.index.duplicated())>0 #check whether there is duplicated values in the index
+        rp=rp.reindex(index=date_index).ffill() # resample to business day and fill missing values
+        rp=rp.astype(float).interpolate(method = 'linear',limit_area='inside').dropna(how='all')
         ########################################
         # Repo volume, current
         ########################################
@@ -214,7 +215,7 @@ class vendor:
         rpvol.sort_index(inplace = True)
         rpvol.rename(columns = dict(zip(rpvol.columns, [x + '_vol' for x in rpvol.columns])), inplace = True)
         sum(rpvol.index.duplicated())>0 #check whether there is duplicated values in the index
-        rpvol=rpvol.reindex(index=date_index)
-        rpvol=rpvol.astype(float).interpolate(method = 'linear',limit_area='inside')
+        rpvol=rpvol.reindex(index=date_index).ffill()
+        rpvol=rpvol.astype(float).interpolate(method = 'linear',limit_area='inside').dropna(how='all')
 
         return rp, rpvol
